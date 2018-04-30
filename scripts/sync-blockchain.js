@@ -25,7 +25,7 @@ async function init() {
     console.log('Last block stored:', lastBlockDb.number);
   } catch (err) {
     console.log('Error getting last block.');
-    throw err;
+    init();
   }
 
   // Gets last block from tron chain
@@ -34,7 +34,7 @@ async function init() {
     console.log('Last block TRON chain:', lastBlock.number);
   } catch (err) {
     console.log('Error getting last block from database.');
-    throw err;
+    init();
   }
 
   if (lastBlockDb === 0 || lastBlock.number < lastBlockDb.number) {
@@ -43,9 +43,15 @@ async function init() {
   }
 
   for (let i = lastBlockDb.number + 1; i <= lastBlock.number; i++) {
-    const block = await TronClient.getBlockByNum(i);
-    console.log(`Processing block: ${block.number} (${block.transactions.length} tx)`);
-    await storeBlock(block);
+    try {
+      const block = await TronClient.getBlockByNum(i);
+      console.log(`Processing block: ${block.number} (${block.transactions.length} tx)`);
+      await storeBlock(block);
+    } catch (err) {
+      // if there is an error then shortcircuit for-loop and start again in 1-minute
+      init();
+      break;
+    }
   }
   setTimeout(() => init(), 60 * 1000); // autoinvoke in 1 minute
 }
