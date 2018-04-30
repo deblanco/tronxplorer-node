@@ -1,10 +1,10 @@
-const pe = require('parse-error');
+pe = require('parse-error');
 
-const to = function (promise) {
+to = function (promise) {
   return promise.then(data => [null, data]).catch(err => [pe(err)]);
 };
 
-const TE = function (err_message, log) {
+TE = function (err_message, log) {
   // TE stands for Throw Error
   if (log === true) {
     console.error(err_message);
@@ -12,7 +12,7 @@ const TE = function (err_message, log) {
   throw new Error(err_message);
 };
 
-const ReE = function (res, err, code) {
+ReE = function (res, err, code) {
   // Error Web Response
   if (typeof err === 'object' && typeof err.message !== 'undefined') {
     err = err.message;
@@ -21,7 +21,7 @@ const ReE = function (res, err, code) {
   return res.json({ success: false, error: err });
 };
 
-const ReS = function (res, data, code) {
+ReS = function (res, data, code) {
   // Success Web Response
   let send_data = { success: true };
   if (typeof data === 'object') {

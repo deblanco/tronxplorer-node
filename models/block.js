@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Transaction = require('./transaction');
 
 const BlockSchema = mongoose.Schema({
   contractType: {
@@ -17,11 +18,7 @@ const BlockSchema = mongoose.Schema({
   size: Number,
   time: Number,
   totalTrx: Number,
-  transactions: [{
-    amount: Number,
-    from: String,
-    to: String,
-  }],
+  transactions: ['Transaction'],
   transactionsCount: Number,
   witnessAddress: String,
 });
