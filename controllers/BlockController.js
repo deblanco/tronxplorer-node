@@ -8,14 +8,14 @@ const getTransactions = async (req, res) => {
     return ReE(res, 'The account must have 35 characters.');
   }
   const [err, txs] = await to(Block.aggregate([
+    { $sort: { number: -1 } },
+    { $limit: 500 },
     { $unwind: '$transactions' },
     {
       $match: {
         $or: [{ 'transactions.from': address }, { 'transactions.to': address }],
       },
     },
-    { $sort: { number: -1 } },
-    { $limit: 500 },
   ]));
 
   if (err) return ReE(res, `No transactions found for ${address}`);
