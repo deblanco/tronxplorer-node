@@ -26,6 +26,7 @@ async function init() {
   } catch (err) {
     console.log('Error getting last block.');
     init();
+    return false;
   }
 
   // Gets last block from tron chain
@@ -35,6 +36,7 @@ async function init() {
   } catch (err) {
     console.log('Error getting last block from database.');
     init();
+    return false;
   }
 
   if (lastBlockDb === 0 || lastBlock.number < lastBlockDb.number) {
@@ -50,7 +52,7 @@ async function init() {
     } catch (err) {
       // if there is an error then shortcircuit for-loop and start again in 1-minute
       init();
-      break;
+      return false;
     }
   }
   setTimeout(() => init(), 60 * 1000); // autoinvoke in 1 minute
