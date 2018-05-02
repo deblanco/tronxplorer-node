@@ -9,24 +9,31 @@ const getTransactions = async (req, res) => {
   }
   const [err, txs] = await to(Block.aggregate([
     { $sort: { number: -1 } },
-    { $limit: 500 },
     { $unwind: '$transactions' },
     {
       $match: {
         $or: [{ 'transactions.from': address }, { 'transactions.to': address }],
       },
     },
+    { $limit: 1000 },
   ]));
 
+  const mapTxs = txs.map((btx) => {
+    const btxIsolated = btx.transactions;
+    btxIsolated.block = btx.number;
+    btxIsolated.time = btx.time;
+    return btxIsolated;
+  });
+
   if (err) return ReE(res, `No transactions found for ${address}`);
-  ReS(res, { transactions: txs });
+  ReS(res, { transactions: mapTxs });
 };
 
 const getLastestTransactions = async (req, res) => {
   const limit = +req.params.limit || 10;
   const [err, txs] = await to(Block.aggregate([
-    { $unwind: '$transactions' },
     { $sort: { number: -1 } },
+    { $unwind: '$transactions' },
     { $limit: limit },
   ]));
 
@@ -43,15 +50,23 @@ const getBlock = async (req, res) => {
   const [err, blck] = await to(Block.findOne({ number: block }));
 
   if (err) return ReE(res, `Error: ${err}`);
-  ReS(res, { block: blck });
+  ReS(res, { block: blckReduced });
 };
 
 const getLastestBlocks = async (req, res) => {
   const limit = +req.params.limit || 10;
-  const [err, blcks] = await to(Block.find().sort({ number: -1 }).limit(limit));
+  const [err, blcks] = await to(Block.find({}).sort({ number: -1 }).limit(limit));
+
+  const blckReduced = blcks.map((blckm) => {
+    const newBlock = blckm.toObject();
+    // get sum of TRX from all transactions
+    newBlock.totalTrx = blckm.transactions.reduce((total, tx) => total + tx.amount, 0).toFixed(4);
+    delete newBlock.transactions;
+    return newBlock;
+  });
 
   if (err) return ReE(res, `Error: ${err}`);
-  ReS(res, { blocks: blcks });
+  ReS(res, { blocks: blckReduced });
 };
 
 module.exports = {
