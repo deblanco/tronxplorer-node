@@ -23,7 +23,7 @@ async function init() {
   let lastBlock;
 
   try {
-    lastBlockDb = await Block.findOne().sort('-number') || 0;
+    lastBlockDb = await Block.findOne().sort('-number') || { number: 0 };
     console.log('Last block stored:', lastBlockDb.number);
   } catch (err) {
     console.log('Error getting last block.');
