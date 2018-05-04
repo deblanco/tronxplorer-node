@@ -6,11 +6,13 @@
  * Authors: Daniel Blanco, Santiago de los Santos
  */
 
-const HttpClient = require('@tronprotocol/wallet-api/src/client/http');
+const GrpcClient = require('@tronprotocol/wallet-api/src/client/grpc');
 const mongoose = require('mongoose');
 const Block = require('../models/block');
 
-const TronClient = new HttpClient();
+const TronClient = new GrpcClient({
+  hostname: '47.254.146.147', // full node
+});
 const db = connect(); // connect to mongo
 
 // init procedure
@@ -46,10 +48,11 @@ async function init() {
 
   for (let i = lastBlockDb.number + 1; i <= lastBlock.number; i++) {
     try {
-      const block = await TronClient.getBlockByNum(i);
-      console.log(`Processing block: ${block.number} (${block.transactions.length} tx)`);
+      const block = await TronClient.getBlockByNumber(i);
+      console.log(`Processing block: ${block.number} (${block.transactionsList.length} tx)`);
       await storeBlock(block);
     } catch (err) {
+      console.log(err);
       // if there is an error then shortcircuit for-loop and start again in 1-minute
       init();
       return false;
