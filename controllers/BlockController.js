@@ -9,17 +9,17 @@ const getTransactions = async (req, res) => {
   }
   const [err, txs] = await to(Block.aggregate([
     { $sort: { number: -1 } },
-    { $unwind: '$transactions' },
+    { $unwind: '$transactionsList' },
     {
       $match: {
-        $or: [{ 'transactions.from': address }, { 'transactions.to': address }],
+        $or: [{ 'transactionsList.from': address }, { 'transactionsList.to': address }],
       },
     },
     { $limit: 1000 },
   ]));
 
   const mapTxs = txs.map((btx) => {
-    const btxIsolated = btx.transactions;
+    const btxIsolated = btx.transactionsList;
     btxIsolated.block = btx.number;
     btxIsolated.time = btx.time;
     return btxIsolated;
@@ -33,11 +33,11 @@ const getLastestTransactions = async (req, res) => {
   const limit = +req.params.limit || 10;
   const [err, txs] = await to(Block.aggregate([
     { $sort: { number: -1 } },
-    { $unwind: '$transactions' },
+    { $unwind: '$transactionsList' },
     { $limit: limit },
   ]));
 
-  if (err) return ReE(res, `Error: ${err}`);
+  if (err) return ReE(res, `Error: ${JSON.stringify(err)}`);
   ReS(res, { transactions: txs });
 };
 
@@ -60,8 +60,8 @@ const getLastestBlocks = async (req, res) => {
   const blckReduced = blcks.map((blckm) => {
     const newBlock = blckm.toObject();
     // get sum of TRX from all transactions
-    newBlock.totalTrx = blckm.transactions.reduce((total, tx) => total + tx.amount, 0).toFixed(4);
-    delete newBlock.transactions;
+    newBlock.totalTrx = blckm.transactionsList.reduce((total, tx) => total + ((tx && tx.amount) ? tx.amount : 0), 0).toFixed(4);
+    delete newBlock.transactionsList;
     return newBlock;
   });
 

@@ -58,7 +58,7 @@ async function init() {
       return false;
     }
   }
-  setTimeout(() => init(), 60 * 1000); // autoinvoke in 1 minute
+  setTimeout(() => init(), 30 * 1000); // autoinvoke in 30 seconds
 }
 
 async function storeBlock(blockObject) {
@@ -85,5 +85,5 @@ async function dropCollection() {
   // if the blockchain has been resetted we need to drop the collection
   // remove functionality with mainnet launch to avoid errors.
   // throws 'ns not found' if collection doesn't exist... don't take care
-  return Block.collection.drop();
+  return Block.collection.remove({});
 }
