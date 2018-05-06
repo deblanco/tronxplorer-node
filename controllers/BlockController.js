@@ -50,7 +50,7 @@ const getBlock = async (req, res) => {
   const [err, blck] = await to(Block.findOne({ number: block }));
 
   if (err) return ReE(res, `Error: ${err}`);
-  ReS(res, { block: blckReduced });
+  ReS(res, { block: blck });
 };
 
 const getLastestBlocks = async (req, res) => {

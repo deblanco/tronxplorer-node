@@ -18,7 +18,7 @@ const BlockSchema = mongoose.Schema({
   size: Number,
   time: Number,
   totalTrx: Number,
-  transactions: ['Transaction'],
+  transactionsList: ['Transaction'],
   transactionsCount: Number,
   witnessAddress: String,
 });
