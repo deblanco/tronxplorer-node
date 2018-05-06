@@ -49,8 +49,12 @@ async function init() {
   for (let i = lastBlockDb.number + 1; i <= lastBlock.number; i++) {
     try {
       const block = await TronClient.getBlockByNumber(i);
-      console.log(`Processing block: ${block.number} (${block.transactionsList.length} tx)`);
-      await storeBlock(block);
+      if (!block) {
+        console.log(`Seems that block ${i} is empty.`);
+      } else {
+        console.log(`Processing block: ${block.number} (${block.transactionsList.length} tx)`);
+        await storeBlock(block);
+      }
     } catch (err) {
       console.log(err);
       // if there is an error then shortcircuit for-loop and start again in 1-minute
