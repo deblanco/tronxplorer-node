@@ -37,8 +37,15 @@ const getLastestTransactions = async (req, res) => {
     { $limit: limit },
   ]));
 
+  const mapTxs = txs.map((btx) => {
+    const btxIsolated = btx.transactionsList;
+    btxIsolated.block = btx.number;
+    btxIsolated.time = btx.time;
+    return btxIsolated;
+  });
+
   if (err) return ReE(res, `Error: ${JSON.stringify(err)}`);
-  ReS(res, { transactions: txs });
+  ReS(res, { transactions: mapTxs });
 };
 
 const getBlock = async (req, res) => {
