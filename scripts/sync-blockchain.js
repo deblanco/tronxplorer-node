@@ -11,7 +11,7 @@ const mongoose = require('mongoose');
 const Block = require('../models/block');
 
 const TronClient = new GrpcClient({
-  hostname: '39.106.220.120', // full node
+  hostname: '47.254.146.147', // full node
 });
 const db = connect(); // connect to mongo
 
