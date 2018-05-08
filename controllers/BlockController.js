@@ -37,7 +37,8 @@ const getLastestTransactions = async (req, res) => {
     { $limit: limit },
   ]));
 
-  const mapTxs = txs.map((btx) => {
+  // sometimes TX comes empty?? testnet?
+  const mapTxs = txs.filter(x => !!x.transactionsList).map((btx) => {
     const btxIsolated = btx.transactionsList;
     btxIsolated.block = btx.number;
     btxIsolated.time = btx.time;
