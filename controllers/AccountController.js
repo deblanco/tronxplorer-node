@@ -1,7 +1,9 @@
 require("./../global_functions");
-const HttpClient = require('@tronprotocol/wallet-api/src/client/http');
+const GrpcClient = require('@tronprotocol/wallet-api/src/client/grpc');
 
-const TronClient = new HttpClient();
+const TronClient = new GrpcClient({
+  hostname: CONFIG.tron_node,
+});
 
 const getAccount = async (req, res) => {
   const { address } = req.params;
@@ -13,6 +15,12 @@ const getAccount = async (req, res) => {
   ReS(res, { account: fAccount });
 };
 
+const getAccounts = async (req, res) => {
+  const fAccounts = await to(TronClient.getAccounts());
+  ReS(res, { accounts: fAccounts });
+};
+
 module.exports = {
-    getAccount,
+  getAccount,
+  getAccounts,
 };
