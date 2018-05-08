@@ -11,12 +11,12 @@ const getAccount = async (req, res) => {
   if (!address || address.length < 35) {
     return ReE(res, "The account must have 35 characters.");
   }
-  const fAccount = await to(TronClient.getAccount(address));
+  const [err, fAccount] = await to(TronClient.getAccount(address));
   ReS(res, { account: fAccount });
 };
 
 const getAccounts = async (req, res) => {
-  const fAccounts = await to(TronClient.getAccounts());
+  const [err, fAccounts] = await to(TronClient.getAccounts());
   ReS(res, { accounts: fAccounts });
 };
 
