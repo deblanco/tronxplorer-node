@@ -22,6 +22,8 @@ async function init() {
   let lastBlockDb;
   let lastBlock;
 
+  console.log(`${new Date().toISOString()} Syncing...`);
+
   try {
     lastBlockDb = await Block.findOne().sort('-number') || { number: 0 };
     console.log('Last block stored:', lastBlockDb.number);
