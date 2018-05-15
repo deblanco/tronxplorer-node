@@ -6,6 +6,7 @@ const BlockController = require('./../controllers/BlockController');
 const AccountController = require('./../controllers/AccountController');
 const TokenController = require('./../controllers/TokenController');
 const NetworkController = require('./../controllers/NetworkController');
+const SearchController = require('./../controllers/SearchController');
 
 router.get('/transactions/:address', BlockController.getTransactions);
 router.get('/transactions/last/:limit', BlockController.getLastestTransactions);
@@ -21,5 +22,7 @@ router.get('/witnesses/:address', NetworkController.getWitness);
 
 router.get('/tokens', TokenController.getTokens);
 router.get('/tokens/:name', TokenController.getToken);
+
+router.get('/search', SearchController.queryFor);
 
 module.exports = router;
