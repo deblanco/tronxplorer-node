@@ -28,23 +28,25 @@ const searchBlocks = async (number) => {
 };
 
 const searchAccounts = async (address) => {
-  const rgx = new RegExp(`^${address}`, 'i');
-  const [err, fAccounts] = await to(TronClient.getAccounts());
-  const accountsFiltered = fAccounts.filter(acc1 => rgx.test(acc1.address));
-  const accountsMapped = accountsFiltered.length > 0 ? [...Array(LIMIT_RESULTS)].map((x, i) => {
-    return {
-      value: accountsFiltered[i].address,
-      type: 'account',
-    };
-  }) : [];
-  return accountsMapped;
+  // const rgx = new RegExp(`^${address}`, 'i');
+  // const [err, fAccounts] = await to(TronClient.getAccounts());
+  // const accountsFiltered = fAccounts.filter(acc1 => rgx.test(acc1.address));
+  // const accountsMapped = accountsFiltered.length > 0 ? [...Array(LIMIT_RESULTS)].map((x, i) => {
+  //   return {
+  //     value: accountsFiltered[i].address,
+  //     type: 'account',
+  //   };
+  // }) : [];
+  // return accountsMapped;
+  return [];
 };
 
 const searchTokens = async (tkn) => {
   const rgx = new RegExp(`^${tkn}`, 'i');
   const [err, fTokens] = await to(TronClient.getAssets());
   const assetsFiltered = fTokens.filter(tknx => rgx.test(tknx.name));
-  const assetsMaped = assetsFiltered.length > 0 ? [...Array(LIMIT_RESULTS)].map((x, i) => {
+  const iterations = assetsFiltered.length >= LIMIT_RESULTS ? LIMIT_RESULTS : assetsFiltered.length;
+  const assetsMaped = assetsFiltered.length > 0 ? [...Array(iterations)].map((x, i) => {
     return {
       value: assetsFiltered[i].name,
       type: 'token',
