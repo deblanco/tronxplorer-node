@@ -6,11 +6,18 @@ const getBlock = async (req, res) => {
   if (!block || !Number.isInteger(+block)) {
     return ReE(res, `The block must be specified or a number: ${block}.`);
   }
+  const blockPromises = [Block.findOne({ number: block }), Block.findOne({ number: +block + 1 })];
+  const [err, blck] = await to(Promise.all(blockPromises));
 
-  const [err, blck] = await to(Block.findOne({ number: block }));
+  const computeBlock = blck[0].toJSON();
+  computeBlock.previous = block - 1;
+  computeBlock.next = blck[1] ? +block + 1 : null;
+
+  delete computeBlock['_id'];
+  delete computeBlock['__v'];
 
   if (err) return ReE(res, `Error: ${err}`);
-  ReS(res, { block: blck });
+  ReS(res, { block: computeBlock });
 };
 
 const getLastestBlocks = async (req, res) => {
