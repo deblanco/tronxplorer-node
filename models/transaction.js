@@ -5,6 +5,10 @@ const TransanctionSchema = mongoose.Schema({
   from: String,
   to: String,
   hash: String,
+  time: Number,
+  data: String,
+  scripts: String,
+  block: Number,
 });
 
 module.exports = mongoose.model('Transaction', TransanctionSchema);
