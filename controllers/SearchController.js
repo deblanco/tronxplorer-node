@@ -20,7 +20,7 @@ const searchBlocks = async (number) => {
     return [...Array(LIMIT_RESULTS)].map((y, i) => {
       return {
         value: +(number + [...Array(nines9)].map(() => 9).join('')) - i,
-        type: 'block',
+        type: 'blocks',
       };
     });
   }
@@ -49,7 +49,7 @@ const searchTokens = async (tkn) => {
   const assetsMaped = assetsFiltered.length > 0 ? [...Array(iterations)].map((x, i) => {
     return {
       value: assetsFiltered[i].name,
-      type: 'token',
+      type: 'tokens',
     };
   }) : [];
   return assetsMaped;
