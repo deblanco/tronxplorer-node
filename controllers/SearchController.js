@@ -18,6 +18,13 @@ const searchBlocks = async (number) => {
     const nines9 = lastBlock.number.toString().length - number.toString().length;
     if (nines9 === 0) return [{ value: +number, type: 'block' }];
     return [...Array(LIMIT_RESULTS)].map((y, i) => {
+      const ninesGen = +(number + [...Array(nines9)].map(() => 9).join('')) - i;
+      if (ninesGen > lastBlock.number) {
+        return {
+          value: lastBlock.number - i,
+          type: 'blocks',
+        };
+      }
       return {
         value: +(number + [...Array(nines9)].map(() => 9).join('')) - i,
         type: 'blocks',
@@ -27,7 +34,7 @@ const searchBlocks = async (number) => {
   return arrayReturn;
 };
 
-const searchAccounts = async (address) => {
+const searchAccounts = async (address) =>
   // const rgx = new RegExp(`^${address}`, 'i');
   // const [err, fAccounts] = await to(TronClient.getAccounts());
   // const accountsFiltered = fAccounts.filter(acc1 => rgx.test(acc1.address));
@@ -38,20 +45,16 @@ const searchAccounts = async (address) => {
   //   };
   // }) : [];
   // return accountsMapped;
-  return [];
-};
-
+  [];
 const searchTokens = async (tkn) => {
   const rgx = new RegExp(`^${tkn}`, 'i');
   const [err, fTokens] = await to(TronClient.getAssets());
   const assetsFiltered = fTokens.filter(tknx => rgx.test(tknx.name));
   const iterations = assetsFiltered.length >= LIMIT_RESULTS ? LIMIT_RESULTS : assetsFiltered.length;
-  const assetsMaped = assetsFiltered.length > 0 ? [...Array(iterations)].map((x, i) => {
-    return {
-      value: assetsFiltered[i].name,
-      type: 'tokens',
-    };
-  }) : [];
+  const assetsMaped = assetsFiltered.length > 0 ? [...Array(iterations)].map((x, i) => ({
+    value: assetsFiltered[i].name,
+    type: 'tokens',
+  })) : [];
   return assetsMaped;
 };
 
