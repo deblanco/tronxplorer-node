@@ -70,7 +70,8 @@ async function init() {
 
 function storeBlock(blockObject) {
   const operations = [];
-  blockObject.transactionsList.forEach((tx) => {
+  const transactions = blockObject.transactionsList.filter(x => !!x);
+  transactions.forEach((tx) => {
     // TRANSACTION
     operations.push(Transaction.create({
       ...tx,

@@ -19,16 +19,8 @@ const getLastestTransactions = async (req, res) => {
   const limit = +req.params.limit || 10;
   const [err, txs] = await to(Transaction.find({}).sort({ block: -1 }).limit(limit));
 
-  // sometimes TX comes empty?? testnet?
-  const mapTxs = txs.filter(x => !!x.transactionsList).map((btx) => {
-    const btxIsolated = btx.transactionsList;
-    btxIsolated.block = btx.number;
-    btxIsolated.time = btx.time;
-    return btxIsolated;
-  });
-
   if (err) return ReE(res, `Error: ${JSON.stringify(err)}`);
-  ReS(res, { transactions: mapTxs });
+  ReS(res, { transactions: txs });
 };
 
 const getTransaction = async (req, res) => {
