@@ -1,5 +1,5 @@
 const GrpcClient = require('@tronprotocol/wallet-api/src/client/grpc');
-const { Block } = require('./../models');
+const { Transaction, Account } = require('./../models');
 require('./../global_functions');
 
 const TronClient = new GrpcClient({
@@ -33,22 +33,21 @@ const searchBlocks = async (number) => {
   return arrayReturn;
 };
 
-const searchAccounts = async address =>
-  // const rgx = new RegExp(`^${address}`, 'i');
-  // const [err, fAccounts] = await to(TronClient.getAccounts());
-  // const accountsFiltered = fAccounts.filter(acc1 => rgx.test(acc1.address));
-  // const accountsMapped = accountsFiltered.length > 0 ? [...Array(LIMIT_RESULTS)].map((x, i) => {
-  //   return {
-  //     value: accountsFiltered[i].address,
-  //     type: 'account',
-  //   };
-  // }) : [];
-  // return accountsMapped;
-  [];
+const searchAccounts = async (accountString) => {;
+  const accountStringLow = accountString.toLowerCase();
+  const [err, accs] = await to(Account.find({ address: new RegExp(`^${accountStringLow}`) }));
+
+  const iterations = accs.length >= LIMIT_RESULTS ? LIMIT_RESULTS : accs.length;
+  const accsMaped = accs.length > 0 ? [...Array(iterations)].map((x, i) => ({
+    value: accs[i].address,
+    type: 'accounts',
+  })) : [];
+  return accsMaped;
+};
 
 const searchTokens = async (tkn) => {
   const rgx = new RegExp(`^${tkn}`, 'i');
-  const [err, fTokens] = await to(TronClient.getAssets());
+  const [err, fTokens] = await to(TronClient.getAssetIssueList());
   const assetsFiltered = fTokens.filter(tknx => rgx.test(tknx.name));
   const iterations = assetsFiltered.length >= LIMIT_RESULTS ? LIMIT_RESULTS : assetsFiltered.length;
   const assetsMaped = assetsFiltered.length > 0 ? [...Array(iterations)].map((x, i) => ({
@@ -60,17 +59,11 @@ const searchTokens = async (tkn) => {
 
 const searchTx = async (txstring) => {
   const txstringUp = txstring.toUpperCase();
-  const [err, txs] = await to(Block.aggregate([
-    { $sort: { number: -1 } },
-    { $unwind: '$transactionsList' },
-    {
-      $match:
-        { 'transactionsList.hash': txstring },
-    }]));
+  const [err, txs] = await to(Transaction.find({ hash: new RegExp(`^${txstringUp}`) }));
 
   const iterations = txs.length >= LIMIT_RESULTS ? LIMIT_RESULTS : txs.length;
   const txsMaped = txs.length > 0 ? [...Array(iterations)].map((x, i) => ({
-    value: txs[i].transactionsList.hash,
+    value: txs[i].hash,
     type: 'transactions',
   })) : [];
   return txsMaped;

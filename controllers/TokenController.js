@@ -6,7 +6,7 @@ const TronClient = new GrpcClient({
 });
 
 const getTokens = async (req, res) => {
-  const [err, fTokens] = await to(TronClient.getAssets());
+  const [err, fTokens] = await to(TronClient.getAssetIssueList());
   return ReS(res, { tokens: fTokens });
 };
 
