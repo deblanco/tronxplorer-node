@@ -1,4 +1,4 @@
-const { Block } = require('./../models');
+const { Block, Transaction } = require('./../models');
 require('./../global_functions');
 
 const getTransactions = async (req, res) => {
@@ -7,35 +7,17 @@ const getTransactions = async (req, res) => {
   if (!address || address.length < 35) {
     return ReE(res, 'The account must have 35 characters.');
   }
-  const [err, txs] = await to(Block.aggregate([
-    { $sort: { number: -1 } },
-    { $unwind: '$transactionsList' },
-    {
-      $match: {
-        $or: [{ 'transactionsList.from': address }, { 'transactionsList.to': address }],
-      },
-    },
-    { $limit: 1000 },
-  ]));
-
-  const mapTxs = txs.map((btx) => {
-    const btxIsolated = btx.transactionsList;
-    btxIsolated.block = btx.number;
-    btxIsolated.time = btx.time;
-    return btxIsolated;
-  });
+  const [err, txs] = await to(Transaction.find({
+    $or: [{ from: address }, { to: address }],
+  }).sort({ block: -1 }).limit(1000));
 
   if (err) return ReE(res, `No transactions found for ${address}`);
-  ReS(res, { transactions: mapTxs });
+  ReS(res, { transactions: txs });
 };
 
 const getLastestTransactions = async (req, res) => {
   const limit = +req.params.limit || 10;
-  const [err, txs] = await to(Block.aggregate([
-    { $sort: { number: -1 } },
-    { $unwind: '$transactionsList' },
-    { $limit: limit },
-  ]));
+  const [err, txs] = await to(Transaction.find({}).sort({ block: -1 }).limit(limit));
 
   // sometimes TX comes empty?? testnet?
   const mapTxs = txs.filter(x => !!x.transactionsList).map((btx) => {
@@ -55,11 +37,7 @@ const getTransaction = async (req, res) => {
     return ReE(res, 'The transaction\'s hash must be specified.');
   }
 
-  const [err, fTx] = await to(Block.aggregate([
-    { $unwind: '$transactionsList' },
-    { $match:
-        { 'transactionsList.hash': transactionHash },
-    }]));
+  const [err, fTx] = await to(Transaction.find({ hash: transactionHash }));
 
   const tx = fTx[0] || [];
   if (err) return ReE(res, `Error: ${err}`);
