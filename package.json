@@ -5,6 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start": "node ./bin/www",
+    "blockchain": "node ./scripts/sync-blockchain.js",
     "refresh-api": "rm -rf node_modules/@tronprotocol; npm i"
   },
   "repository": {

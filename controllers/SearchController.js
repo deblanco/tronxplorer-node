@@ -10,8 +10,7 @@ const LIMIT_RESULTS = 3;
 
 const searchBlocks = async (number) => {
   if (!Number.isInteger(+number)) return [];
-  const [err, lastBlockRaw] = await to(Block.find().sort({ number: -1 }).limit(1));
-  const lastBlock = lastBlockRaw[0];
+  const [err, lastBlock] = await to(TronClient.getLatestBlock());
   if (err) throw err;
   const arrayReturn = [];
   if (number < lastBlock.number) {
@@ -34,7 +33,7 @@ const searchBlocks = async (number) => {
   return arrayReturn;
 };
 
-const searchAccounts = async (address) =>
+const searchAccounts = async address =>
   // const rgx = new RegExp(`^${address}`, 'i');
   // const [err, fAccounts] = await to(TronClient.getAccounts());
   // const accountsFiltered = fAccounts.filter(acc1 => rgx.test(acc1.address));
@@ -46,6 +45,7 @@ const searchAccounts = async (address) =>
   // }) : [];
   // return accountsMapped;
   [];
+
 const searchTokens = async (tkn) => {
   const rgx = new RegExp(`^${tkn}`, 'i');
   const [err, fTokens] = await to(TronClient.getAssets());
@@ -58,12 +58,35 @@ const searchTokens = async (tkn) => {
   return assetsMaped;
 };
 
+const searchTx = async (txstring) => {
+  const txstringUp = txstring.toUpperCase();
+  const [err, txs] = await to(Block.aggregate([
+    { $sort: { number: -1 } },
+    { $unwind: '$transactionsList' },
+    {
+      $match:
+        { 'transactionsList.hash': txstring },
+    }]));
+
+  const iterations = txs.length >= LIMIT_RESULTS ? LIMIT_RESULTS : txs.length;
+  const txsMaped = txs.length > 0 ? [...Array(iterations)].map((x, i) => ({
+    value: txs[i].transactionsList.hash,
+    type: 'transactions',
+  })) : [];
+  return txsMaped;
+};
+
 const queryFor = async (req, res) => {
   const queryParameter = req.query.string;
   // validation
-  if (!queryParameter) return ReE(res, 'Query string is empty');
+  if (!queryParameter || queryParameter.length === 0) return ReE(res, 'Query string is empty');
 
-  const promisesArr = [searchBlocks(queryParameter), searchAccounts(queryParameter), searchTokens(queryParameter)];
+  const promisesArr = [
+    searchBlocks(queryParameter),
+    searchAccounts(queryParameter),
+    searchTokens(queryParameter),
+    searchTx(queryParameter),
+  ];
 
   try {
     const results = await Promise.all(promisesArr);

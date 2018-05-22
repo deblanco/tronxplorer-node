@@ -16,9 +16,8 @@ const getToken = async (req, res) => {
   if (!name || name.length === '') {
     return ReE(res, 'Must send a name as argument.');
   }
-  const [err, fTokens] = await to(TronClient.getAssets());
-  const tokenMatch = fTokens.find(token => token.name === name);
-  return ReS(res, { token: tokenMatch });
+  const [err, fTokens] = await to(TronClient.getAssetIssueByName(name));
+  return ReS(res, { token: fTokens });
 };
 
 module.exports = {
