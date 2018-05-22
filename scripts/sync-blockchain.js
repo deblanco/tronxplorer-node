@@ -8,7 +8,8 @@
 
 const GrpcClient = require('@tronprotocol/wallet-api/src/client/grpc');
 const mongoose = require('mongoose');
-const Block = require('../models/block');
+const Account = require('../models/account');
+const Transaction = require('../models/transaction');
 
 const TronClient = new GrpcClient({
   hostname: '47.254.146.147', // full node
@@ -25,8 +26,8 @@ async function init() {
   console.log(`${new Date().toISOString()} Syncing...`);
 
   try {
-    lastBlockDb = await Block.findOne().sort('-number') || { number: 0 };
-    console.log('Last block stored:', lastBlockDb.number);
+    lastBlockDb = await Transaction.findOne().sort('-block') || { block: 0 };
+    console.log('Last block stored:', lastBlockDb.block);
   } catch (err) {
     console.log('Error getting last block.');
     init();
@@ -43,12 +44,12 @@ async function init() {
     return false;
   }
 
-  if (lastBlockDb === 0 || lastBlock.number < lastBlockDb.number) {
+  if (lastBlockDb === 0 || lastBlock.number < lastBlockDb.block) {
     dropCollection();
     lastBlockDb = -1;
   }
 
-  for (let i = lastBlockDb.number + 1; i <= lastBlock.number; i++) {
+  for (let i = lastBlockDb.block + 1; i <= lastBlock.number; i++) {
     try {
       const block = await TronClient.getBlockByNumber(i);
       if (!block) {
@@ -67,8 +68,24 @@ async function init() {
   setTimeout(() => init(), 30 * 1000); // autoinvoke in 30 seconds
 }
 
-async function storeBlock(blockObject) {
-  return Block.create(blockObject);
+function storeBlock(blockObject) {
+  const operations = [];
+  blockObject.transactionsList.forEach((tx) => {
+    // TRANSACTION
+    operations.push(Transaction.create({
+      ...tx,
+      block: blockObject.number,
+    }));
+    // FROM
+    if (tx.from && tx.from.length > 0) {
+      operations.push(Account.findOneAndUpdate({ address: tx.from }, TronClient.getAccount(tx.from), { upsert: true }));
+    }
+    // TO
+    if (tx.to && tx.to.length > 0) {
+      operations.push(Account.findOneAndUpdate({ address: tx.to }, TronClient.getAccount(tx.to), { upsert: true }));
+    }
+  });
+  return Promise.all(operations);
 }
 
 async function connect() {
@@ -91,5 +108,6 @@ async function dropCollection() {
   // if the blockchain has been resetted we need to drop the collection
   // remove functionality with mainnet launch to avoid errors.
   // throws 'ns not found' if collection doesn't exist... don't take care
-  return Block.collection.remove({});
+  Transaction.collection.remove({});
+  Account.collection.remove({});
 }
