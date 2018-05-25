@@ -1,5 +1,10 @@
+const GrpcClient = require('@tronprotocol/wallet-api/src/client/grpc');
 const { Block, Transaction } = require('./../models');
 require('./../global_functions');
+
+const TronClient = new GrpcClient({
+  hostname: CONFIG.tron_node,
+});
 
 const getTransactions = async (req, res) => {
   const { address } = req.params;
@@ -17,10 +22,23 @@ const getTransactions = async (req, res) => {
 
 const getLastestTransactions = async (req, res) => {
   const limit = +req.params.limit || 10;
-  const [err, txs] = await to(Transaction.find({}).sort({ block: -1 }).limit(limit));
 
-  if (err) return ReE(res, `Error: ${JSON.stringify(err)}`);
-  ReS(res, { transactions: txs });
+  const lastBlock = await TronClient.getLatestBlock();
+  const lastTxs = [];
+  let i = 0;
+
+  while (lastTxs.length < limit) {
+    const blck = i === 0 ? lastBlock : await TronClient.getBlockByNumber(lastBlock.number - i);
+    blck.transactionsList.forEach((tx) => {
+      if (lastTxs.length < limit) {
+        const txi = tx;
+        txi.block = blck.number;
+        lastTxs.push(txi);
+      }
+    });
+    i += 1;
+  }
+  ReS(res, { transactions: lastTxs });
 };
 
 const getTransaction = async (req, res) => {
