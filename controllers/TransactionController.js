@@ -32,12 +32,12 @@ const getTransactions = async (req, res) => {
 const getLastestTransactions = async (req, res) => {
   const limit = +req.params.limit || 10;
 
-  const lastBlock = await TronClient.getLatestBlock();
+  const lastBlock = await SolidClient.getLatestBlock();
   const lastTxs = [];
   let i = 0;
 
   while (lastTxs.length < limit) {
-    const blck = i === 0 ? lastBlock : await TronClient.getBlockByNumber(lastBlock.number - i);
+    const blck = i === 0 ? lastBlock : await SolidClient.getBlockByNumber(lastBlock.number - i);
     blck.transactionsList.forEach((tx) => {
       if (lastTxs.length < limit) {
         const txi = tx;
