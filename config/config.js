@@ -13,3 +13,4 @@ CONFIG.db_user = process.env.DB_USER || 'root';
 CONFIG.db_password = process.env.DB_PASSWORD || 'db-password';
 
 CONFIG.tron_node = process.env.TRON_NODE;
+CONFIG.solidity_node = process.env.SOLIDITY_NODE;

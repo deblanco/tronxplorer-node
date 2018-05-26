@@ -1,9 +1,16 @@
+const SolidityClient = require('@tronprotocol/wallet-api/src/client/solidity_grpc');
 const GrpcClient = require('@tronprotocol/wallet-api/src/client/grpc');
 const { Block, Transaction } = require('./../models');
 require('./../global_functions');
 
+const SolidClient = new SolidityClient({
+  hostname: CONFIG.solidity_node,
+  port: 50051,
+});
+
 const TronClient = new GrpcClient({
   hostname: CONFIG.tron_node,
+  port: 50051,
 });
 
 const getTransactions = async (req, res) => {
@@ -12,11 +19,11 @@ const getTransactions = async (req, res) => {
   if (!address || address.length < 35) {
     return ReE(res, 'The account must have 35 characters.');
   }
-  const [err, txs] = await to(Transaction.find({
-    $or: [{ from: address }, { to: address }],
-  }).sort({ block: -1 }).limit(1000));
+  const [txFrom, txTo] = await Promise.all([
+    TronClient.getTransactionsFromThis(address),
+    TronClient.getTransactionsToThis(address),
+  ]);
 
-  if (err) return ReE(res, `No transactions found for ${address}`);
   ReS(res, { transactions: txs });
 };
 
@@ -47,9 +54,9 @@ const getTransaction = async (req, res) => {
     return ReE(res, 'The transaction\'s hash must be specified.');
   }
 
-  const [err, fTx] = await to(Transaction.find({ hash: transactionHash }));
+  const [err, fTx] = await to(SolidClient.getTransactionById(transactionHash));
 
-  const tx = fTx[0] || [];
+  const tx = fTx || {};
   if (err) return ReE(res, `Error: ${err}`);
   ReS(res, { transaction: tx });
 };
