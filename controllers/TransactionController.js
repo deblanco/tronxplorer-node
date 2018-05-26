@@ -20,9 +20,11 @@ const getTransactions = async (req, res) => {
     return ReE(res, 'The account must have 35 characters.');
   }
   const [txFrom, txTo] = await Promise.all([
-    TronClient.getTransactionsFromThis(address),
-    TronClient.getTransactionsToThis(address),
+    SolidClient.getTransactionsFromThis(address),
+    SolidClient.getTransactionsToThis(address),
   ]);
+
+  const txs = txFrom.concat(txTo).sort((a, b) => b.time - a.time);
 
   ReS(res, { transactions: txs });
 };

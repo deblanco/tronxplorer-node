@@ -32,7 +32,7 @@ const getLastestBlocks = async (req, res) => {
   limit = Number.isInteger(+req.params.limit) ? limit : 10;
 
   const latestBlock = await TronClient.getLatestBlock();
-  const aPromises = [];
+  const aPromises = [latestBlock];
 
   [...Array(limit - 1)].forEach((x, i) => {
     aPromises.push(TronClient.getBlockByNumber(latestBlock.number - 1 - i));
