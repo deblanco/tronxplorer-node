@@ -34,8 +34,8 @@ const getLastestBlocks = async (req, res) => {
   const latestBlock = await TronClient.getLatestBlock();
   const aPromises = [latestBlock];
 
-  [...Array(limit - 1)].forEach((x, i) => {
-    aPromises.push(TronClient.getBlockByNumber(latestBlock.number - 1 - i));
+  [...Array(limit - 2)].forEach((x, i) => {
+    aPromises.push(TronClient.getBlockByNumber(latestBlock.number - 2 - i));
   });
 
   const [err, response] = await to(Promise.all(aPromises));
