@@ -6,13 +6,14 @@
  * Authors: Daniel Blanco, Santiago de los Santos
  */
 
-const GrpcClient = require('@tronprotocol/wallet-api/src/client/grpc');
+const SolidityClient = require('@tronprotocol/wallet-api/src/client/solidity_grpc');
 const mongoose = require('mongoose');
 const Account = require('../models/account');
 const Transaction = require('../models/transaction');
 
-const TronClient = new GrpcClient({
-  hostname: '47.254.146.147', // full node
+const TronClient = new SolidityClient({
+  hostname: 'arrimadas.tronxplorer.info',
+  port: 50051,
 });
 const db = connect(); // connect to mongo
 
@@ -68,7 +69,7 @@ async function init() {
   setTimeout(() => init(), 30 * 1000); // autoinvoke in 30 seconds
 }
 
-function storeBlock(blockObject) {
+async function storeBlock(blockObject) {
   const operations = [];
   const transactions = blockObject.transactionsList.filter(x => !!x);
   transactions.forEach((tx) => {
@@ -86,11 +87,14 @@ function storeBlock(blockObject) {
       operations.push(Account.findOneAndUpdate({ address: tx.to }, TronClient.getAccount(tx.to), { upsert: true }));
     }
   });
-  return Promise.all(operations);
+
+  for (let i = 0; i <= operations.length; i++) {
+    await operations[i];
+  }
 }
 
 async function connect() {
-  const mongoLocation = 'mongodb://tron_rw:tron_rw_2018@api.tronxplorer.info:27017/tronxplorer';
+  const mongoLocation = 'mongodb://tronxplorer:tron_rw@api.tronxplorer.info:27017/tronxplorer';
   await mongoose.connect(mongoLocation).catch((err) => {
     console.log('*** Can Not Connect to Mongo Server:', mongoLocation);
     throw err;
