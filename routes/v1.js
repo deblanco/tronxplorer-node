@@ -12,6 +12,7 @@ const TransactionController = require('./../controllers/TransactionController');
 router.get('/transaction/:transactionHash', TransactionController.getTransaction);
 router.get('/transactions/:address', TransactionController.getTransactions);
 router.get('/transactions/last/:limit', TransactionController.getLastestTransactions);
+router.get('/transactions/list/:limit', TransactionController.getTransactionList);
 
 router.get('/blocks/:block', BlockController.getBlock);
 router.get('/blocks/last/:limit', BlockController.getLastestBlocks);

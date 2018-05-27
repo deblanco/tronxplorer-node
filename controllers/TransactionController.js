@@ -1,16 +1,10 @@
 const SolidityClient = require('@tronprotocol/wallet-api/src/client/solidity_grpc');
-const GrpcClient = require('@tronprotocol/wallet-api/src/client/grpc');
-const { Block, Transaction } = require('./../models');
+const { Transaction } = require('./../models');
 require('./../global_functions');
 
 const SolidClient = new SolidityClient({
   hostname: CONFIG.solidity_node,
   port: CONFIG.solidity_node_port,
-});
-
-const TronClient = new GrpcClient({
-  hostname: CONFIG.tron_node,
-  port: CONFIG.tron_node_port,
 });
 
 const getTransactions = async (req, res) => {
@@ -30,7 +24,8 @@ const getTransactions = async (req, res) => {
 };
 
 const getLastestTransactions = async (req, res) => {
-  const limit = +req.params.limit || 10;
+  let limit = +req.params.limit || 10;
+  if (limit > 20) limit = 20;
 
   const lastBlock = await SolidClient.getLatestBlock();
   const lastTxs = [];
@@ -50,6 +45,15 @@ const getLastestTransactions = async (req, res) => {
   ReS(res, { transactions: lastTxs });
 };
 
+const getTransactionList = async (req, res) => {
+  const limit = +req.params.limit || 1000;
+
+  const [err, fTxs] = await to(Transaction.find({}).sort({ block: -1 }).limit(limit));
+  const txs = fTxs || [];
+  if (err) return ReE(res, `Error: ${err}`);
+  ReS(res, { transaction: txs });
+};
+
 const getTransaction = async (req, res) => {
   const { transactionHash } = req.params;
   if (!transactionHash) {
@@ -65,5 +69,6 @@ const getTransaction = async (req, res) => {
 module.exports = {
   getTransactions,
   getLastestTransactions,
+  getTransactionList,
   getTransaction,
 };
