@@ -41,7 +41,6 @@ const getLastestTransactions = async (req, res) => {
     blck.transactionsList.forEach((tx) => {
       if (lastTxs.length < limit) {
         const txi = tx;
-        txi.time /= 1000000;
         txi.block = blck.number;
         lastTxs.push(txi);
       }
@@ -59,8 +58,6 @@ const getTransaction = async (req, res) => {
 
   const [err, fTx] = await to(SolidClient.getTransactionById(transactionHash));
   const tx = fTx || null;
-  // timestamps fix
-  if (tx) tx.time /= 1000000;
   if (err) return ReE(res, `Error: ${err}`);
   ReS(res, { transaction: tx });
 };
