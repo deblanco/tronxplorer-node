@@ -51,7 +51,7 @@ const getTransactionList = async (req, res) => {
   const [err, fTxs] = await to(Transaction.find({}).sort({ block: -1 }).limit(limit));
   const txs = fTxs || [];
   if (err) return ReE(res, `Error: ${err}`);
-  ReS(res, { transaction: txs });
+  ReS(res, { transactions: txs });
 };
 
 const getTransaction = async (req, res) => {
