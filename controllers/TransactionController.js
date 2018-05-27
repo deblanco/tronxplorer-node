@@ -5,12 +5,12 @@ require('./../global_functions');
 
 const SolidClient = new SolidityClient({
   hostname: CONFIG.solidity_node,
-  port: 50051,
+  port: CONFIG.solidity_node_port,
 });
 
 const TronClient = new GrpcClient({
   hostname: CONFIG.tron_node,
-  port: 50051,
+  port: CONFIG.tron_node_port,
 });
 
 const getTransactions = async (req, res) => {

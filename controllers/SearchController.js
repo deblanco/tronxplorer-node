@@ -4,6 +4,7 @@ require('./../global_functions');
 
 const TronClient = new GrpcClient({
   hostname: CONFIG.tron_node,
+  port: CONFIG.tron_node_port,
 });
 
 const LIMIT_RESULTS = 3;
