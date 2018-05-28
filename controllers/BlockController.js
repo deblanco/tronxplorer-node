@@ -35,7 +35,7 @@ const getLastestBlocks = async (req, res) => {
   const latestBlock = await TronClient.getLatestBlock();
   const blocksFetched = [];
 
-  for (let i = latestBlock.number - 1; blocksFetched.length < limit; i -= 1) {
+  for (let i = latestBlock.number - 1; blocksFetched.length < limit - 1; i -= 1) {
     const blck = await TronClient.getBlockByNumber(i);
     blocksFetched.push(blck);
   }
