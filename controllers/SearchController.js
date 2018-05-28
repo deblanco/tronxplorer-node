@@ -35,8 +35,18 @@ const searchBlocks = async (number) => {
 };
 
 const searchAccounts = async (accountString) => {;
-  const accountStringLow = accountString.toLowerCase();
-  const [err, accs] = await to(Account.find({ address: new RegExp(`^${accountStringLow}`, 'i') }));
+  const [err, accs] = await to(Account.find({ address: new RegExp(`^${accountString}`, 'i') }));
+
+  const iterations = accs.length >= LIMIT_RESULTS ? LIMIT_RESULTS : accs.length;
+  const accsMaped = accs.length > 0 ? [...Array(iterations)].map((x, i) => ({
+    value: accs[i].address,
+    type: 'accounts',
+  })) : [];
+  return accsMaped;
+};
+
+const searchAccountsByName = async (accountString) => {;
+  const [err, accs] = await to(Account.find({ accountName: new RegExp(`^${accountString}`, 'i') }));
 
   const iterations = accs.length >= LIMIT_RESULTS ? LIMIT_RESULTS : accs.length;
   const accsMaped = accs.length > 0 ? [...Array(iterations)].map((x, i) => ({
@@ -80,6 +90,7 @@ const queryFor = async (req, res) => {
     searchAccounts(queryParameter),
     searchTokens(queryParameter),
     searchTx(queryParameter),
+    searchAccountsByName(queryParameter),
   ];
 
   try {
