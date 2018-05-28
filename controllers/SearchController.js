@@ -50,7 +50,8 @@ const searchAccountsByName = async (accountString) => {;
 
   const iterations = accs.length >= LIMIT_RESULTS ? LIMIT_RESULTS : accs.length;
   const accsMaped = accs.length > 0 ? [...Array(iterations)].map((x, i) => ({
-    value: accs[i].address,
+    value: accs[i].name,
+    address: accs[i].address,
     type: 'accounts',
   })) : [];
   return accsMaped;
