@@ -42,8 +42,7 @@ app.use((req, res, next) => {
 app.use('/v1', v1);
 
 app.use('/', (req, res) => {
-  res.statusCode = 200; // send the appropriate status code
-  res.json({ status: 'success', message: 'Parcel Pending API', data: {} });
+  res.sendfile('./public/index.html');
 });
 
 // catch 404 and forward to error handler
