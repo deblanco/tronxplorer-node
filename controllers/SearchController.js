@@ -36,7 +36,7 @@ const searchBlocks = async (number) => {
 
 const searchAccounts = async (accountString) => {;
   const accountStringLow = accountString.toLowerCase();
-  const [err, accs] = await to(Account.find({ address: new RegExp(`^${accountStringLow}`) }));
+  const [err, accs] = await to(Account.find({ address: new RegExp(`^${accountStringLow}`, 'i') }));
 
   const iterations = accs.length >= LIMIT_RESULTS ? LIMIT_RESULTS : accs.length;
   const accsMaped = accs.length > 0 ? [...Array(iterations)].map((x, i) => ({
@@ -60,7 +60,7 @@ const searchTokens = async (tkn) => {
 
 const searchTx = async (txstring) => {
   const txstringUp = txstring.toUpperCase();
-  const [err, txs] = await to(Transaction.find({ hash: new RegExp(`^${txstringUp}`) }));
+  const [err, txs] = await to(Transaction.find({ hash: new RegExp(`^${txstringUp}`, 'i') }));
 
   const iterations = txs.length >= LIMIT_RESULTS ? LIMIT_RESULTS : txs.length;
   const txsMaped = txs.length > 0 ? [...Array(iterations)].map((x, i) => ({
