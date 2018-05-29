@@ -24,14 +24,16 @@
     "eslint-plugin-import": "^2.11.0"
   },
   "dependencies": {
+    "@tronprotocol/wallet-api": "https://github.com/deblanco/node-wallet-api",
+    "apicache": "^1.2.1",
     "body-parser": "^1.18.2",
     "debug": "^3.1.0",
     "dotenv": "^5.0.1",
     "express": "^4.16.3",
+    "memory-cache": "^0.2.0",
     "mongoose": "^5.0.16",
     "morgan": "^1.9.0",
     "node-fetch": "^2.1.2",
-    "parse-error": "^0.2.0",
-    "@tronprotocol/wallet-api": "https://github.com/deblanco/node-wallet-api"
+    "parse-error": "^0.2.0"
   }
 }
