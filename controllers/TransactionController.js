@@ -27,22 +27,16 @@ const getLastestTransactions = async (req, res) => {
   let limit = +req.params.limit || 10;
   if (limit > 20) limit = 20;
 
-  const lastBlock = await SolidClient.getLatestBlock();
-  const lastTxs = [];
-  let i = 0;
+  const findLatestHashes = await Transaction.find({}).sort({ block: -1 }).limit(limit);
+  const latestTxs = [];
 
-  while (lastTxs.length < limit) {
-    const blck = i === 0 ? lastBlock : await SolidClient.getBlockByNumber(lastBlock.number - i);
-    blck.transactionsList.forEach((tx) => {
-      if (lastTxs.length < limit) {
-        const txi = tx;
-        txi.block = blck.number;
-        lastTxs.push(txi);
-      }
-    });
-    i += 1;
+  for (let i = 0; i < findLatestHashes.length; i+= 1) {
+    const tx = await SolidClient.getTransactionById(findLatestHashes[i].hash);
+    tx.block = findLatestHashes[i].block;
+    latestTxs.push(tx);
   }
-  ReS(res, { transactions: lastTxs });
+
+  ReS(res, { transactions: latestTxs });
 };
 
 const getTransactionList = async (req, res) => {

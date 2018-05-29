@@ -14,7 +14,7 @@ const TransactionController = require('./../controllers/TransactionController');
 router.get('/transaction/:transactionHash', cache('1 day'), TransactionController.getTransaction);
 router.get('/transactions/:address', cache('1 minute'), TransactionController.getTransactions);
 router.get('/transactions/last/:limit', cache('15 seconds'), TransactionController.getLastestTransactions);
-router.get('/transactions/list/:limit', cache('15seconds'), TransactionController.getTransactionList);
+router.get('/transactions/list/:limit', cache('15 seconds'), TransactionController.getTransactionList);
 
 router.get('/blocks/:block', cache('1 day'), BlockController.getBlock);
 router.get('/blocks/last/:limit', cache('15 seconds'), BlockController.getLastestBlocks);
