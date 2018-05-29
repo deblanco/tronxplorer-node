@@ -1,10 +1,21 @@
 require('./../global_functions');
+const cache = require('memory-cache');
 const SolidityClient = require('@tronprotocol/wallet-api/src/client/solidity_grpc');
 
 const TronClient = new SolidityClient({
   hostname: CONFIG.solidity_node,
   port: CONFIG.solidity_node_port,
 });
+
+const fetchBlock = async (height) => {
+  const blockCached = cache.get(height);
+  if (blockCached) {
+    return blockCached;
+  }
+  const block = await TronClient.getBlockByNumber(height);
+  cache.put(height, block);
+  return block;
+};
 
 const getBlock = async (req, res) => {
   const { block } = req.params;
@@ -13,7 +24,7 @@ const getBlock = async (req, res) => {
   }
 
   const reqPromises = [
-    TronClient.getBlockByNumber(block),
+    fetchBlock(block),
     TronClient.getLatestBlock(),
   ];
   const [err, blck] = await to(Promise.all(reqPromises));
@@ -36,7 +47,7 @@ const getLastestBlocks = async (req, res) => {
   const blocksFetched = [];
 
   for (let i = latestBlock.number - 1; blocksFetched.length < limit - 1; i -= 1) {
-    const blck = await TronClient.getBlockByNumber(i);
+    const blck = await fetchBlock(i);
     blocksFetched.push(blck);
   }
 

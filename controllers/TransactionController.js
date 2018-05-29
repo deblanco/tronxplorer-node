@@ -1,3 +1,4 @@
+const cache = require('memory-cache');
 const SolidityClient = require('@tronprotocol/wallet-api/src/client/solidity_grpc');
 const { Transaction } = require('./../models');
 require('./../global_functions');
@@ -6,6 +7,16 @@ const SolidClient = new SolidityClient({
   hostname: CONFIG.solidity_node,
   port: CONFIG.solidity_node_port,
 });
+
+const fetchTransaction = async (hash) => {
+  const txCached = cache.get(hash);
+  if (txCached) {
+    return txCached;
+  }
+  const tx = await SolidClient.getTransactionById(hash);
+  cache.put(hash, tx);
+  return tx;
+};
 
 const getTransactions = async (req, res) => {
   const { address } = req.params;
@@ -31,7 +42,7 @@ const getLastestTransactions = async (req, res) => {
   const latestTxs = [];
 
   for (let i = 0; i < findLatestHashes.length; i+= 1) {
-    const tx = await SolidClient.getTransactionById(findLatestHashes[i].hash);
+    const tx = await fetchTransaction(findLatestHashes[i].hash);
     tx.block = findLatestHashes[i].block;
     latestTxs.push(tx);
   }
@@ -54,7 +65,7 @@ const getTransaction = async (req, res) => {
     return ReE(res, 'The transaction\'s hash must be specified.');
   }
 
-  const [err, fTx] = await to(SolidClient.getTransactionById(transactionHash));
+  const [err, fTx] = await to(fetchTransaction(transactionHash));
   const tx = fTx || null;
   if (err) return ReE(res, `Error: ${err}`);
   ReS(res, { transaction: tx });
