@@ -1,5 +1,6 @@
 # tronxplorer-node
 
+https://api.tronxplorer.info
 
 To run this side of the project following requirements need to be fullfilled:
 ```

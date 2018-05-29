@@ -5,4 +5,6 @@ const TransanctionSchema = mongoose.Schema({
   block: Number,
 });
 
+TransanctionSchema.index({ block: -1 });
+
 module.exports = mongoose.model('Transaction', TransanctionSchema);
