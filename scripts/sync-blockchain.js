@@ -7,13 +7,14 @@
  */
 
 const SolidityClient = require('@tronprotocol/wallet-api/src/client/solidity_grpc');
+require('./../config/config');
 const mongoose = require('mongoose');
 const Account = require('../models/account');
 const Transaction = require('../models/transaction');
 
 const TronClient = new SolidityClient({
-  hostname: 'arrimadas.tronxplorer.info',
-  port: 50051,
+  hostname: CONFIG.solidity_node,
+  port: CONFIG.solidity_node_port,
 });
 const db = connect(); // connect to mongo
 
@@ -94,7 +95,7 @@ async function storeBlock(blockObject) {
 }
 
 async function connect() {
-  const mongoLocation = 'mongodb://tronxplorer:tron_rw@api.tronxplorer.info:27017/tronxplorer';
+  const mongoLocation = `mongodb://${CONFIG.db_user}:${CONFIG.db_password}@${CONFIG.db_host}:${CONFIG.db_port}/${CONFIG.db_name}`;
   await mongoose.connect(mongoLocation).catch((err) => {
     console.log('*** Can Not Connect to Mongo Server:', mongoLocation);
     throw err;
