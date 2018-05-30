@@ -9,12 +9,12 @@ const SolidClient = new SolidityClient({
 });
 
 const fetchTransaction = async (hash) => {
-  const txCached = cache.get(hash);
+  const txCached = cache.get(`tx-${hash}`);
   if (txCached) {
     return txCached;
   }
   const tx = await SolidClient.getTransactionById(hash);
-  cache.put(hash, tx);
+  cache.put(`tx-${hash}`, tx);
   return tx;
 };
 

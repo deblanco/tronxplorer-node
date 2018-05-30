@@ -8,12 +8,12 @@ const TronClient = new SolidityClient({
 });
 
 const fetchBlock = async (height) => {
-  const blockCached = cache.get(height);
+  const blockCached = cache.get(`block-${height}`);
   if (blockCached) {
     return blockCached;
   }
   const block = await TronClient.getBlockByNumber(height);
-  cache.put(height, block);
+  cache.put(`block-${height}`, block);
   return block;
 };
 
