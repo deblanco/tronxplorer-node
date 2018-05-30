@@ -1,5 +1,6 @@
 const SolidityClient = require('@tronprotocol/wallet-api/src/client/solidity_grpc');
 const { Transaction, Account } = require('./../models');
+const cache = require('memory-cache');
 require('./../global_functions');
 
 const TronClient = new SolidityClient({
@@ -9,9 +10,19 @@ const TronClient = new SolidityClient({
 
 const LIMIT_RESULTS = 3;
 
+const fetchCache = async (strCached, asyncFn, time = 60000) => {
+  const isCached = cache.get(strCached);
+  if (isCached) {
+    return isCached;
+  }
+  const fetchFn = await asyncFn;
+  cache.put(strCached, fetchFn, time);
+  return fetchFn;
+};
+
 const searchBlocks = async (number) => {
   if (!Number.isInteger(+number)) return [];
-  const [err, lastBlock] = await to(TronClient.getLatestBlock());
+  const [err, lastBlock] = await to(fetchCache('lastBlock', TronClient.getLatestBlock(), 15000));
   if (err) throw err;
   const arrayReturn = [];
   if (number < lastBlock.number) {
@@ -59,7 +70,7 @@ const searchAccountsByName = async (accountString) => {;
 
 const searchTokens = async (tkn) => {
   const rgx = new RegExp(`^${tkn}`, 'i');
-  const [err, fTokens] = await to(TronClient.getAssetIssueList());
+  const [err, fTokens] = await to(fetchCache('tokens', TronClient.getAssetIssueList(), 2 * 60 * 1000));
   const assetsFiltered = fTokens.filter(tknx => rgx.test(tknx.name));
   const iterations = assetsFiltered.length >= LIMIT_RESULTS ? LIMIT_RESULTS : assetsFiltered.length;
   const assetsMaped = assetsFiltered.length > 0 ? [...Array(iterations)].map((x, i) => ({
@@ -95,7 +106,7 @@ const queryFor = async (req, res) => {
   ];
 
   try {
-    const results = await Promise.all(promisesArr);
+    const results = await fetchCache(`query-${queryParameter}`, Promise.all(promisesArr));
     const outputConcat = Array.prototype.concat(...results);
     ReS(res, { matches: outputConcat });
   } catch (err) {

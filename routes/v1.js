@@ -22,10 +22,10 @@ router.get('/blocks/last/:limit', cache('15 seconds'), BlockController.getLastes
 router.get('/account/:address', cache('1 minute'), AccountController.getAccount);
 router.get('/accounts', cache('15 seconds'), AccountController.getAccounts);
 
-router.get('/witnesses', cache('15 seconds'), NetworkController.getWitnesses);
+router.get('/witnesses', cache('1 minute'), NetworkController.getWitnesses);
 router.get('/witnesses/:address', cache('2 hours'), NetworkController.getWitness);
 
-router.get('/tokens', cache('15 seconds'), TokenController.getTokens);
+router.get('/tokens', cache('1 minute'), TokenController.getTokens);
 router.get('/tokens/:name', cache('2 hours'), TokenController.getToken);
 
 router.get('/search', SearchController.queryFor);
