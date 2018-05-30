@@ -21,7 +21,7 @@ Install dependencies
 $ npm install
 ```
 
-Rename ```.env.example``` and fill ```.env``` file with your parameters: Mongo host, user, password, Tron node
+Rename ```.env.example``` and fill ```.env``` file with your parameters: Mongo host, user, password, Solidity node
 ```
 $ mv .env.example .env; vi .env
 ```
@@ -32,7 +32,7 @@ $ npm run start
 $ npm run blockchain
 ```
 
-### Solidity nodes (TEST)
+## Solidity nodes (TEST)
 
 ```
 #soliditynode = {
