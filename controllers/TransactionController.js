@@ -19,6 +19,9 @@ const fetchTransaction = async (hash) => {
   ]);
   if (txDb[0]) {
     tx.block = txDb[0].block;
+  } else {
+    // till have block dnt cache
+    return tx;
   }
   cache.put(`tx-${hash}`, tx);
   return tx;
