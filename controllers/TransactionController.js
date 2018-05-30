@@ -13,7 +13,13 @@ const fetchTransaction = async (hash) => {
   if (txCached) {
     return txCached;
   }
-  const tx = await SolidClient.getTransactionById(hash);
+  const [tx, txDb] = await Promise.all([
+    SolidClient.getTransactionById(hash),
+    Transaction.find({ hash }),
+  ]);
+  if (txDb[0]) {
+    tx.block = txDb[0].block;
+  }
   cache.put(`tx-${hash}`, tx);
   return tx;
 };
