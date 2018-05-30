@@ -38,16 +38,20 @@ const getLastestTransactions = async (req, res) => {
   let limit = +req.params.limit || 10;
   if (limit > 20) limit = 20;
 
-  const findLatestHashes = await Transaction.find({}).sort({ block: -1 }).limit(limit);
-  const latestTxs = [];
+  try {
+    const findLatestHashes = await Transaction.find({}).sort({ block: -1 }).limit(limit);
+    const latestTxs = [];
 
-  for (let i = 0; i < findLatestHashes.length; i+= 1) {
-    const tx = await fetchTransaction(findLatestHashes[i].hash);
-    tx.block = findLatestHashes[i].block;
-    latestTxs.push(tx);
+    for (let i = 0; i < findLatestHashes.length; i += 1) {
+      const tx = await fetchTransaction(findLatestHashes[i].hash);
+      tx.block = findLatestHashes[i].block;
+      latestTxs.push(tx);
+    }
+
+    ReS(res, { transactions: latestTxs });
+  } catch (err) {
+    getLastestTransactions(req, res);
   }
-
-  ReS(res, { transactions: latestTxs });
 };
 
 const getTransactionList = async (req, res) => {
