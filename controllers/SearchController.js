@@ -15,9 +15,14 @@ const fetchCache = async (strCached, asyncFn, time = 60000) => {
   if (isCached) {
     return isCached;
   }
-  const fetchFn = await asyncFn;
-  cache.put(strCached, fetchFn, time);
-  return fetchFn;
+  try {
+    const fetchFn = await asyncFn;
+    cache.put(strCached, fetchFn, time);
+    return fetchFn;
+  } catch (err) {
+    console.error(err);
+    return fetchCache(strCached, asyncFn, time);
+  }
 };
 
 const searchBlocks = async (number) => {
