@@ -21,6 +21,7 @@ const fetchTransaction = async (hash) => {
     tx.block = txDb[0].block;
   } else {
     // till have block dnt cache
+    tx.block = 'Not synced yet';
     return tx;
   }
   cache.put(`tx-${hash}`, tx);
