@@ -43,25 +43,29 @@ const getLastestBlocks = async (req, res) => {
   let { limit } = req.params;
   limit = Number.isInteger(+req.params.limit) || limit < 10 ? limit : 10;
 
-  const latestBlock = await TronClient.getLatestBlock();
-  const blocksFetched = [];
+  try {
+    const latestBlock = await TronClient.getLatestBlock();
+    const blocksFetched = [];
 
-  for (let i = latestBlock.number - 1; blocksFetched.length < limit - 1; i -= 1) {
-    const blck = await fetchBlock(i);
-    blocksFetched.push(blck);
+    for (let i = latestBlock.number - 1; blocksFetched.length < limit - 1; i -= 1) {
+      const blck = await fetchBlock(i);
+      blocksFetched.push(blck);
+    }
+
+    blocksFetched.unshift(latestBlock);
+
+    ReS(res, {
+      blocks: blocksFetched.map((b) => {
+        const hBlock = b;
+        hBlock.previous = b.number - 1;
+        hBlock.next = b.number === latestBlock.number ? null : b.number + 1;
+        hBlock.totalTrx = b.transactionsList.reduce((total, tx) => total + ((tx && tx.amount) ? tx.amount : 0), 0).toFixed(4);
+        return hBlock;
+      }),
+    });
+  } catch (err) {
+    getLastestBlocks(req, res);
   }
-
-  blocksFetched.unshift(latestBlock);
-
-  ReS(res, {
-    blocks: blocksFetched.map((b) => {
-      const hBlock = b;
-      hBlock.previous = b.number - 1;
-      hBlock.next = b.number === latestBlock.number ? null : b.number + 1;
-      hBlock.totalTrx = b.transactionsList.reduce((total, tx) => total + ((tx && tx.amount) ? tx.amount : 0), 0).toFixed(4);
-      return hBlock;
-    }),
-  });
 };
 
 module.exports = {
