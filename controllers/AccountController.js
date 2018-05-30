@@ -26,7 +26,7 @@ const fetchCache = async (strCached, asyncFn, time = 60000) => {
 const getAccount = async (req, res) => {
   const { address } = req.params;
   // validation
-  if (!address || address.length < 35) {
+  if (!address || address.length !== 35) {
     return ReE(res, "The account must have 35 characters.");
   }
   const [err, fAccount] = await to(fetchCache(`account-${address}`, TronClient.getAccount(address)));
