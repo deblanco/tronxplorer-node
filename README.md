@@ -1,6 +1,10 @@
 # tronxplorer-node
 
-https://api.tronxplorer.info
+Backend for [Tronxplorer Blockchain Explorer](https://github.com/deblanco/TronXplorer). To know how to connect and interact with TRON blockchain please visit: https://github.com/deblanco/node-wallet-api
+
+API DOC: https://api.tronxplorer.info
+
+## Installation steps:
 
 To run this side of the project following requirements need to be fullfilled:
 ```
@@ -8,8 +12,6 @@ OS: Linux or unix derivatives
 Node.js >= 8 LTS
 MongoDB 4 and one user Read-Write
 ```
-
-## Installation steps:
 
 Clone Github project
 ```
