@@ -23,6 +23,7 @@ const fetchTransaction = async (hash) => {
     TronClient.getTransactionById(hash),
     Transaction.find({ hash }),
   ]);
+  if (!tx) return null;
   if (txDb[0]) {
     tx.block = txDb[0].block;
   } else {
@@ -58,10 +59,10 @@ const getLastestTransactions = async (req, res) => {
     const findLatestHashes = await Transaction.find({}).sort({ block: -1 }).limit(limit);
     const latestTxs = [];
 
-    for (let i = 0; i < findLatestHashes.length; i += 1) {
+    let i = 0;
+    for (i; i < findLatestHashes.length; i += 1) {
       const tx = await fetchTransaction(findLatestHashes[i].hash);
-      tx.block = findLatestHashes[i].block;
-      latestTxs.push(tx);
+      if (tx) latestTxs.push(tx);
     }
 
     ReS(res, { transactions: latestTxs });

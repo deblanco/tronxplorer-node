@@ -23,7 +23,7 @@ Install dependencies
 $ npm install
 ```
 
-Rename ```.env.example``` and fill ```.env``` file with your parameters: Mongo host, user, password, Solidity node
+Rename ```.env.example``` and fill ```.env``` file with your parameters: Mongo host, user, password, Solidity node, Full node
 ```
 $ mv .env.example .env; vi .env
 ```
