@@ -1,5 +1,6 @@
 const cache = require('memory-cache');
 const SolidityClient = require('@tronprotocol/wallet-api/src/client/solidity_grpc');
+const GrpcClient = require('@tronprotocol/wallet-api/src/client/grpc');
 const { Transaction } = require('./../models');
 require('./../global_functions');
 
@@ -8,13 +9,18 @@ const SolidClient = new SolidityClient({
   port: CONFIG.solidity_node_port,
 });
 
+const TronClient = new GrpcClient({
+  hostname: CONFIG.tron_node,
+  port: CONFIG.tron_node_port,
+});
+
 const fetchTransaction = async (hash) => {
   const txCached = cache.get(`tx-${hash}`);
   if (txCached) {
     return txCached;
   }
   const [tx, txDb] = await Promise.all([
-    SolidClient.getTransactionById(hash),
+    TronClient.getTransactionById(hash),
     Transaction.find({ hash }),
   ]);
   if (txDb[0]) {
@@ -31,8 +37,8 @@ const fetchTransaction = async (hash) => {
 const getTransactions = async (req, res) => {
   const { address } = req.params;
   // validation
-  if (!address || address.length < 35) {
-    return ReE(res, 'The account must have 35 characters.');
+  if (!address || address.length < 34) {
+    return ReE(res, 'The account must have 34 characters.');
   }
   const [txFrom, txTo] = await Promise.all([
     SolidClient.getTransactionsFromThis(address),

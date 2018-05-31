@@ -1,11 +1,11 @@
-const SolidityClient = require('@tronprotocol/wallet-api/src/client/solidity_grpc');
+const GrpcClient = require('@tronprotocol/wallet-api/src/client/grpc');
 const { Account } = require('./../models');
 const cache = require('memory-cache');
-require("./../global_functions");
+require('./../global_functions');
 
-const TronClient = new SolidityClient({
-  hostname: CONFIG.solidity_node,
-  port: CONFIG.solidity_node_port,
+const TronClient = new GrpcClient({
+  hostname: CONFIG.tron_node,
+  port: CONFIG.tron_node_port,
 });
 
 const fetchCache = async (strCached, asyncFn, time = 60000) => {
@@ -26,8 +26,8 @@ const fetchCache = async (strCached, asyncFn, time = 60000) => {
 const getAccount = async (req, res) => {
   const { address } = req.params;
   // validation
-  if (!address || address.length !== 35) {
-    return ReE(res, "The account must have 35 characters.");
+  if (!address || address.length !== 34) {
+    return ReE(res, 'The account must have 34 characters.');
   }
   const [err, fAccount] = await to(fetchCache(`account-${address}`, TronClient.getAccount(address)));
   ReS(res, { account: fAccount });

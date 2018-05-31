@@ -1,9 +1,9 @@
 require('./../global_functions');
-const SolidityClient = require('@tronprotocol/wallet-api/src/client/solidity_grpc');
+const GrpcClient = require('@tronprotocol/wallet-api/src/client/grpc');
 
-const TronClient = new SolidityClient({
-  hostname: CONFIG.solidity_node,
-  port: CONFIG.solidity_node_port,
+const TronClient = new GrpcClient({
+  hostname: CONFIG.tron_node,
+  port: CONFIG.tron_node_port,
 });
 
 const getWitnesses = async (req, res) => {
