@@ -1,10 +1,5 @@
+const { TronClient } = require('../utils/trongrpc');
 require('./../global_functions');
-const GrpcClient = require('@tronprotocol/wallet-api/src/client/grpc');
-
-const TronClient = new GrpcClient({
-  hostname: CONFIG.tron_node,
-  port: CONFIG.tron_node_port,
-});
 
 const getWitnesses = async (req, res) => {
   const [err, fWitnesses] = await to(TronClient.getWitnesses());

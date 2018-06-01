@@ -1,11 +1,6 @@
+const { TronClient } = require('../utils/trongrpc');
 const { Transaction, Account } = require('./../models');
 require('./../global_functions');
-const GrpcClient = require('@tronprotocol/wallet-api/src/client/grpc');
-
-const TronClient = new GrpcClient({
-  hostname: CONFIG.tron_node,
-  port: CONFIG.tron_node_port,
-});
 
 const LIMIT_RESULTS = 3;
 
