@@ -1,5 +1,5 @@
 const { TronClient } = require('../utils/trongrpc');
-require('./../global_functions');
+const { to, ReE, ReS } = require('../utils/responseHandler');
 
 const getTokens = async (req, res) => {
   const [err, fTokens] = await to(TronClient.getAssetIssueList());

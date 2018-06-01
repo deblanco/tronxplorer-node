@@ -1,6 +1,6 @@
 const { TronClient, SolidityClient } = require('../utils/trongrpc');
 const { Transaction } = require('./../models');
-require('./../global_functions');
+const { to, ReE, ReS } = require('../utils/responseHandler');
 
 const fetchTransaction = async (hash) => {
   const [tx, txDb] = await Promise.all([

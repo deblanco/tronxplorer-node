@@ -1,10 +1,8 @@
-pe = require('parse-error');
+const pe = require('parse-error');
 
-to = function (promise) {
-  return promise.then(data => [null, data]).catch(err => [pe(err)]);
-};
+const to = (promise) => promise.then(data => [null, data]).catch(err => [pe(err)]);
 
-TE = function (err_message, log) {
+const TE = (err_message, log) => {
   // TE stands for Throw Error
   if (log === true) {
     console.error(err_message);
@@ -12,7 +10,7 @@ TE = function (err_message, log) {
   throw new Error(err_message);
 };
 
-ReE = function (res, err, code) {
+const ReE = (res, err, code) => {
   // Error Web Response
   if (typeof err === 'object' && typeof err.message !== 'undefined') {
     err = err.message;
@@ -21,7 +19,7 @@ ReE = function (res, err, code) {
   return res.json({ success: false, error: err });
 };
 
-ReS = function (res, data, code) {
+const ReS = (res, data, code) => {
   // Success Web Response
   let send_data = { success: true };
   if (typeof data === 'object') {
@@ -30,7 +28,14 @@ ReS = function (res, data, code) {
   if (typeof code !== 'undefined') res.statusCode = code;
   return res.json(send_data);
 };
+
 // This is here to handle all the uncaught promise rejections
 process.on('unhandledRejection', (error) => {
   console.error('Uncaught Error', pe(error));
 });
+
+module.exports = {
+  to,
+  ReS,
+  ReE,
+};

@@ -1,5 +1,5 @@
 const { TronClient } = require('../utils/trongrpc');
-require('./../global_functions');
+const { to, ReE, ReS } = require('../utils/responseHandler');
 
 const getBlock = async (req, res) => {
   const { block } = req.params;

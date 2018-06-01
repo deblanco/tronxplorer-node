@@ -1,5 +1,5 @@
 const { TronClient } = require('../utils/trongrpc');
-require('./../global_functions');
+const { to, ReE, ReS } = require('../utils/responseHandler');
 
 const getWitnesses = async (req, res) => {
   const [err, fWitnesses] = await to(TronClient.getWitnesses());

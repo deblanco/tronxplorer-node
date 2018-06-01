@@ -1,6 +1,6 @@
 const { TronClient } = require('../utils/trongrpc');
 const { Transaction, Account } = require('./../models');
-require('./../global_functions');
+const { to, ReE, ReS } = require('../utils/responseHandler');
 
 const LIMIT_RESULTS = 3;
 

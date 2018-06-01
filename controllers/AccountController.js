@@ -1,6 +1,6 @@
 const { TronClient } = require('../utils/trongrpc');
 const { Account } = require('./../models');
-require('./../global_functions');
+const { to, ReE, ReS } = require('../utils/responseHandler');
 
 const getAccount = async (req, res) => {
   const { address } = req.params;

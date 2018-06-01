@@ -1,5 +1,4 @@
 require('./config/config'); // instantiate configuration variables
-require('./global_functions'); // instantiate global functions
 
 console.log('Environment:', CONFIG.app);
 
