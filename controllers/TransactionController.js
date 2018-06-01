@@ -1,4 +1,3 @@
-const cache = require('memory-cache');
 const SolidityClient = require('@tronprotocol/wallet-api/src/client/solidity_grpc');
 const GrpcClient = require('@tronprotocol/wallet-api/src/client/grpc');
 const { Transaction } = require('./../models');
@@ -15,10 +14,6 @@ const TronClient = new GrpcClient({
 });
 
 const fetchTransaction = async (hash) => {
-  const txCached = cache.get(`tx-${hash}`);
-  if (txCached) {
-    return txCached;
-  }
   const [tx, txDb] = await Promise.all([
     TronClient.getTransactionById(hash),
     Transaction.find({ hash }),
@@ -26,12 +21,7 @@ const fetchTransaction = async (hash) => {
   if (!tx) return null;
   if (txDb[0]) {
     tx.block = txDb[0].block;
-  } else {
-    // till have block dnt cache
-    tx.block = 'Not synced yet';
-    return tx;
   }
-  cache.put(`tx-${hash}`, tx);
   return tx;
 };
 

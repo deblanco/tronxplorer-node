@@ -1,21 +1,10 @@
 require('./../global_functions');
-const cache = require('memory-cache');
 const GrpcClient = require('@tronprotocol/wallet-api/src/client/grpc');
 
 const TronClient = new GrpcClient({
   hostname: CONFIG.tron_node,
   port: CONFIG.tron_node_port,
 });
-
-const fetchBlock = async (height) => {
-  const blockCached = cache.get(`block-${height}`);
-  if (blockCached) {
-    return blockCached;
-  }
-  const block = await TronClient.getBlockByNumber(height);
-  cache.put(`block-${height}`, block);
-  return block;
-};
 
 const getBlock = async (req, res) => {
   const { block } = req.params;
@@ -24,7 +13,7 @@ const getBlock = async (req, res) => {
   }
 
   const reqPromises = [
-    fetchBlock(block),
+    TronClient.getBlockByNumber(block),
     TronClient.getLatestBlock(),
   ];
   const [err, blck] = await to(Promise.all(reqPromises));
@@ -48,7 +37,7 @@ const getLastestBlocks = async (req, res) => {
     const blocksFetched = [];
 
     for (let i = latestBlock.number - 1; blocksFetched.length < limit - 1; i -= 1) {
-      const blck = await fetchBlock(i);
+      const blck = await TronClient.getBlockByNumber(i);
       blocksFetched.push(blck);
     }
 

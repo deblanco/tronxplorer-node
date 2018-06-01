@@ -1,5 +1,4 @@
 const { Transaction, Account } = require('./../models');
-const cache = require('memory-cache');
 require('./../global_functions');
 const GrpcClient = require('@tronprotocol/wallet-api/src/client/grpc');
 
@@ -10,24 +9,9 @@ const TronClient = new GrpcClient({
 
 const LIMIT_RESULTS = 3;
 
-const fetchCache = async (strCached, asyncFn, time = 60000) => {
-  const isCached = cache.get(strCached);
-  if (isCached) {
-    return isCached;
-  }
-  try {
-    const fetchFn = await asyncFn;
-    cache.put(strCached, fetchFn, time);
-    return fetchFn;
-  } catch (err) {
-    console.error(err);
-    return fetchCache(strCached, asyncFn, time);
-  }
-};
-
 const searchBlocks = async (number) => {
   if (!Number.isInteger(+number)) return [];
-  const [err, lastBlock] = await to(fetchCache('block-lastBlock', TronClient.getLatestBlock(), 15000));
+  const [err, lastBlock] = await to(TronClient.getLatestBlock());
   if (err) throw err;
   const arrayReturn = [];
   if (number < lastBlock.number) {
@@ -75,7 +59,7 @@ const searchAccountsByName = async (accountString) => {;
 
 const searchTokens = async (tkn) => {
   const rgx = new RegExp(`^${tkn}`, 'i');
-  const [err, fTokens] = await to(fetchCache('token-allTokens', TronClient.getAssetIssueList(), 2 * 60 * 1000));
+  const [err, fTokens] = await to(TronClient.getAssetIssueList());
   const assetsFiltered = fTokens.filter(tknx => rgx.test(tknx.name));
   const iterations = assetsFiltered.length >= LIMIT_RESULTS ? LIMIT_RESULTS : assetsFiltered.length;
   const assetsMaped = assetsFiltered.length > 0 ? [...Array(iterations)].map((x, i) => ({
@@ -111,7 +95,7 @@ const queryFor = async (req, res) => {
   ];
 
   try {
-    const results = await fetchCache(`search-${queryParameter}`, Promise.all(promisesArr));
+    const results = await Promise.all(promisesArr);
     const outputConcat = Array.prototype.concat(...results);
     ReS(res, { matches: outputConcat });
   } catch (err) {
