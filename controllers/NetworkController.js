@@ -3,6 +3,7 @@ require('./../global_functions');
 
 const getWitnesses = async (req, res) => {
   const [err, fWitnesses] = await to(TronClient.getWitnesses());
+  if (err) return ReE(res, `Error: ${JSON.stringify(err)}`);
   return ReS(res, { witnesses: fWitnesses });
 };
 
@@ -13,6 +14,9 @@ const getWitness = async (req, res) => {
     return ReE(res, 'Must send a address as argument.');
   }
   const [err, fWitnessess] = await to(TronClient.getWitnesses());
+
+  if (err) return ReE(res, `Error: ${JSON.stringify(err)}`);
+
   const witnessMatch = fWitnessess.find(witness => witness.address === address);
   return ReS(res, { witness: witnessMatch });
 };

@@ -13,7 +13,7 @@ const getBlock = async (req, res) => {
   ];
   const [err, blck] = await to(Promise.all(reqPromises));
 
-  if (err) return ReE(res, `Error: ${err}`);
+  if (err) return ReE(res, `Error: ${JSON.stringify(err)}`);
 
   blck[0].previous = blck[0].number - 1;
   blck[0].next = blck[0].number === blck[1].number ? null : blck[0].number + 1;
@@ -48,7 +48,7 @@ const getLastestBlocks = async (req, res) => {
       }),
     });
   } catch (err) {
-    getLastestBlocks(req, res);
+    ReE(res, `Error: ${JSON.stringify(err)}`);
   }
 };
 

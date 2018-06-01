@@ -9,11 +9,13 @@ const getAccount = async (req, res) => {
     return ReE(res, 'The account must have 34 characters.');
   }
   const [err, fAccount] = await to(TronClient.getAccount(address));
+  if (err) return ReE(res, `Error: ${JSON.stringify(err)}`);
   ReS(res, { account: fAccount });
 };
 
 const getAccounts = async (req, res) => {
   const [err, fAccounts] = await to(Account.find({}));
+  if (err) return ReE(res, `Error: ${JSON.stringify(err)}`);
   ReS(res, { accounts: fAccounts });
 };
 

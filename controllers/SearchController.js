@@ -94,7 +94,7 @@ const queryFor = async (req, res) => {
     const outputConcat = Array.prototype.concat(...results);
     ReS(res, { matches: outputConcat });
   } catch (err) {
-    return ReE(res, err);
+    ReE(res, `Error: ${JSON.stringify(err)}`);
   }
 };
 

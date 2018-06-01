@@ -20,13 +20,15 @@ const getTransactions = async (req, res) => {
   if (!address || address.length < 34) {
     return ReE(res, 'The account must have 34 characters.');
   }
-  const [txFrom, txTo] = await Promise.all([
+
+  const [err, txFromTo] = await to(Promise.all([
     SolidityClient.getTransactionsFromThis(address),
     SolidityClient.getTransactionsToThis(address),
-  ]);
+  ]));
 
-  const txs = txFrom.concat(txTo).sort((a, b) => b.time - a.time);
+  if (err) return ReE(res, `Error: ${JSON.stringify(err)}`);
 
+  const txs = txFromTo[0].concat(txFromTo[1]).sort((a, b) => b.time - a.time);
   ReS(res, { transactions: txs });
 };
 
@@ -46,7 +48,7 @@ const getLastestTransactions = async (req, res) => {
 
     ReS(res, { transactions: latestTxs });
   } catch (err) {
-    getLastestTransactions(req, res);
+    ReE(res, `Error: ${JSON.stringify(err)}`);
   }
 };
 
@@ -55,7 +57,7 @@ const getTransactionList = async (req, res) => {
 
   const [err, fTxs] = await to(Transaction.find({}).sort({ block: -1 }).limit(limit));
   const txs = fTxs || [];
-  if (err) return ReE(res, `Error: ${err}`);
+  if (err) return ReE(res, `Error: ${JSON.stringify(err)}`);
   ReS(res, { transactions: txs });
 };
 
@@ -67,7 +69,7 @@ const getTransaction = async (req, res) => {
 
   const [err, fTx] = await to(fetchTransaction(transactionHash));
   const tx = fTx || null;
-  if (err) return ReE(res, `Error: ${err}`);
+  if (err) return ReE(res, `Error: ${JSON.stringify(err)}`);
   ReS(res, { transaction: tx });
 };
 
