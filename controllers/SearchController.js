@@ -7,7 +7,9 @@ const LIMIT_RESULTS = 3;
 const searchBlocks = async (number) => {
   if (!Number.isInteger(+number)) return [];
   const [err, lastBlock] = await to(TronClient.getLatestBlock());
-  if (err) throw err;
+
+  if (err) return [];
+
   const arrayReturn = [];
   if (number < lastBlock.number) {
     const nines9 = lastBlock.number.toString().length - number.toString().length;
@@ -32,6 +34,8 @@ const searchBlocks = async (number) => {
 const searchAccounts = async (accountString) => {;
   const [err, accs] = await to(Account.find({ address: new RegExp(`^${accountString}`, 'i') }));
 
+  if (err) return [];
+
   const iterations = accs.length >= LIMIT_RESULTS ? LIMIT_RESULTS : accs.length;
   const accsMaped = accs.length > 0 ? [...Array(iterations)].map((x, i) => ({
     value: accs[i].address,
@@ -42,6 +46,8 @@ const searchAccounts = async (accountString) => {;
 
 const searchAccountsByName = async (accountString) => {;
   const [err, accs] = await to(Account.find({ accountName: new RegExp(`^${accountString}`, 'i') }));
+
+  if (err) return [];
 
   const iterations = accs.length >= LIMIT_RESULTS ? LIMIT_RESULTS : accs.length;
   const accsMaped = accs.length > 0 ? [...Array(iterations)].map((x, i) => ({
@@ -55,6 +61,9 @@ const searchAccountsByName = async (accountString) => {;
 const searchTokens = async (tkn) => {
   const rgx = new RegExp(`^${tkn}`, 'i');
   const [err, fTokens] = await to(TronClient.getAssetIssueList());
+
+  if (err) return [];
+
   const assetsFiltered = fTokens.filter(tknx => rgx.test(tknx.name));
   const iterations = assetsFiltered.length >= LIMIT_RESULTS ? LIMIT_RESULTS : assetsFiltered.length;
   const assetsMaped = assetsFiltered.length > 0 ? [...Array(iterations)].map((x, i) => ({
@@ -66,7 +75,9 @@ const searchTokens = async (tkn) => {
 
 const searchTx = async (txstring) => {
   const txstringUp = txstring.toUpperCase();
-  const [err, txs] = await to(Transaction.find({ hash: new RegExp(`^${txstringUp}`, 'i') }));
+  const [err, txs] = await to(Transaction.find({ hash: new RegExp(`^${txstringUp}`) }));
+
+  if (err) return [];
 
   const iterations = txs.length >= LIMIT_RESULTS ? LIMIT_RESULTS : txs.length;
   const txsMaped = txs.length > 0 ? [...Array(iterations)].map((x, i) => ({

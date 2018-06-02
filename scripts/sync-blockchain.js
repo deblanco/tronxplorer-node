@@ -10,12 +10,7 @@ require('./../config/config');
 const mongoose = require('mongoose');
 const Account = require('../models/account');
 const Transaction = require('../models/transaction');
-const GrpcClient = require('@tronprotocol/wallet-api/src/client/grpc');
-
-const TronClient = new GrpcClient({
-  hostname: CONFIG.tron_node,
-  port: CONFIG.tron_node_port,
-});
+const { TronClient } = require('../utils/trongrpc');
 
 const db = connect(); // connect to mongo
 
